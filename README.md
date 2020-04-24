@@ -13,3 +13,6 @@
     - If you want to register files for another user, they must be registered before using.
     - Files must already exist in Google storage, and must *not* be assigned to another user.
         - This prevents conflicts if two users are registered as "owning" the same file.
+        
+- `cromwell_headless_submit.py`: a script for interacting with Cromwell for job submission, querying, and aborting.
+    - Run `python3 cromwell_headless_submit.py -h` for args help
