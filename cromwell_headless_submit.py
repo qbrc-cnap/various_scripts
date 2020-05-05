@@ -95,7 +95,7 @@ def submit_job(args):
 
     # Check if there were other WDL files, packaged as a zip:
     if args['dependencies_zip'] and os.path.exists(args['dependencies_zip']):
-        files['workflowDependencies'] = open(zip_archive, 'rb')
+        files['workflowDependencies'] = open(args['dependencies_zip'], 'rb')
 
     # start the job:
     try:
