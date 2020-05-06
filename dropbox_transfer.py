@@ -115,15 +115,33 @@ def pull_folder_from_dropbox(dropbox_path, local_path, client):
 
         print('Starting folder download...')
 
-
         client.files_download_zip_to_file(local_path, dropbox_path)
 
         print('Completed download.  Zip file available at %s' % local_path)
 
     except dropbox.exceptions.ApiError as ex:
-        print('There was an error downloading the folder from Dropbox (%s) to local path: %s' % (dropbox_path, local_path))
-        print(ex)
-        sys.exit(1)
+        err = ex.error
+        if err.too_large:
+            print('The folder was too large to download as a ZIP.  Resorting to individual downloads...')
+            fallback_to_individual_downoads(dropbox_path, local_path, client)
+        else:
+            print('There was an error downloading the folder from Dropbox (%s) to local path: %s' % (dropbox_path, local_path))
+            print(ex)
+            sys.exit(1)
+
+
+def fallback_to_individual_downoads(dropbox_path, local_path, client):
+    '''
+    This is used if the folder is too large and we need to resort to individually downloading the files
+    '''
+    all_files = client.files_list_folder(dropbox_path)
+    # we initially had requested a zip archive be downloaded.
+    # Now, we assume they want the files in the same directory
+    local_dir = os.path.dirname(local_path)
+    for f in all_files.entries:
+        p = f.path_lower
+        local_path = os.path.join(local_dir, os.path.basename(p))
+        pull_file_from_dropbox(p, local_path, client)
 
 
 def pull_file_from_dropbox(dropbox_path, local_path, client):
